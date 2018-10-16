@@ -1,3 +1,9 @@
 p {
     color: white;
 }
+
+.black {
+    align-content: center;
+    background-color: black;
+    width: 400px;
+}

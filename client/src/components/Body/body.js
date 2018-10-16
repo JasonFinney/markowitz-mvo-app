@@ -11,6 +11,19 @@ class Body extends Component {
         Stock2: ""
     }
 
+    showstates = () => {
+        if (this.state.Stock1 === "") {
+            $("#target1").append("50%");
+        } else {
+            $("#target1").append(this.state.Stock1);
+        }
+        if (this.state.Stock2 === "") {
+            $("#target2").append("50%");
+        } else {
+            $("#target2").append(this.state.Stock2);
+        }
+    }
+
     handleInputChange = event => {
         let value = event.target.value;
         const name = event.target.name;
@@ -31,17 +44,12 @@ class Body extends Component {
         //Grab Portfolio Size
         var portfolioSize = this.state.portfolio;
 
-        //Er Arrays
-        var ErArray1 = [];
-        var ErArray2 = [];
-        var DiffArray1 = [];
-        var DiffArray2 = [];
-
-        //Formulas for data 
+        //Arrays for data 
         const reducer = (accumulator, currentValue) => accumulator + currentValue;
         var ErMatrix = [];
         var StdMatrix = [];
-        var CovMatrix = [];
+        var DiffArray1 = [];
+        var DiffArray2 = [];
 
         md.getHistory(this.state.Stock1, 'monthly', { startDate: '20151015' }, { endDate: '20181015' }).then(function (history1) {
             console.log(history1);
@@ -55,9 +63,12 @@ class Body extends Component {
             }
             var Er1 = (expectedArray1.reduce(reducer) / history1.length) * 12;
             ErMatrix.push(Er1);
-            for (let o = 0; o < history1.length; o++) {
-                var item = Er1 - history1[o].close;
-                DiffArray11.push(item);
+            for (let o = 1; o < history1.length; o++) {
+                var p = o - 1;
+                var expectdiff = Math.eval(history1[o].close / history1[p].close);
+                var expecteddiff = expectdiff - 1;
+                var item = expecteddiff - Er1;
+                DiffArray1.push(item);
             }
             standardDeviation(expectedArray1);
             function standardDeviation(values) {
@@ -70,7 +81,6 @@ class Body extends Component {
                 var stdDev = Math.sqrt(avgSquareDiff);
                 StdMatrix.push(stdDev);
             }
-            ErArray1.push(expectedArray1);
             DiffArray1.push(DiffArray11);
         });
         md.getHistory(this.state.Stock2, 'monthly', { startDate: '20151015' }, { endDate: '20181015' }).then(function (history2) {
@@ -85,6 +95,13 @@ class Body extends Component {
             }
             var Er2 = (expectedArray2.reduce(reducer) / history2.length) * 12;
             ErMatrix.push(Er2);
+            for (let o = 1; o < history2.length; o++) {
+                var p = o - 1;
+                var expectdiff = Math.eval(history2[o].close / history2[p].close);
+                var expecteddiff = expectdiff - 1;
+                var item = expecteddiff - Er2;
+                DiffArray2.push(item);
+            }
             standardDeviation(expectedArray2);
             function standardDeviation(values) {
                 var squareDiffs = values.map(function (value) {
@@ -96,23 +113,31 @@ class Body extends Component {
                 var stdDev = Math.sqrt(avgSquareDiff);
                 StdMatrix.push(stdDev);
             }
-            ErArray2.push(expectedArray2);
-            for (let o = 0; o < history2.length; o++) {
-                var item = Er2 - history2[o].close;
-                DiffArray22.push(item);
-            }
             DiffArray2.push(DiffArray22);
         });
         console.log("DiffArrays : " + DiffArray1 + " , " + DiffArray2);
-        var covStock1Stock2 = Math.chain(DiffArray1[0] * DiffArray2[0]).add(DiffArray1[1] * DiffArray2[1]).add(DiffArray1[2] * DiffArray2[2]).divide(6).done();
-        CovMatrix.push(covStock1Stock2);
         console.log(ErMatrix);
+        console.log("means - " + ErMatrix[0] + ", " + ErMatrix[1]);
         console.log(StdMatrix);
-        console.log(CovMatrix);
+        console.log("variances - " + StdMatrix[0] + ", " + StdMatrix[1]);
+
+        var product1 = DiffArray1[0] * DiffArray2[0];
+        var product2 = DiffArray1[1] * DiffArray2[1];
+        var product3 = DiffArray1[2] * DiffArray2[2];
+        var product4 = DiffArray1[3] * DiffArray2[3];
+        var product5 = DiffArray1[4] * DiffArray2[4];
+        var product6 = DiffArray1[5] * DiffArray2[5];
+        var product = product1 + product2 + product3 + product4 + product5 + product6;
+        var len = DiffArray1.length - 1;
+        var covStock1Stock2 = product / len;
+        console.log("covariance - " + covStock1Stock2);
+
         var Er1rf = ErMatrix[0] - riskfreeRate;
         var Er2rf = ErMatrix[1] - riskfreeRate;
         var Std1sqr = StdMatrix[0] * StdMatrix[0];
         var Std2sqr = StdMatrix[1] * StdMatrix[1];
+        console.log("Er1rf = " + Er1rf + ", Er2rf = " + Er2rf + ", Std1sqr = " + Std1sqr + ", Std2sqr = " + Std2sqr);
+
         var weightnom1 = Er1rf * Std2sqr;
         var weightnom2 = Er2rf * covStock1Stock2;
         var weightnom = weightnom1 - weightnom2;
@@ -124,8 +149,13 @@ class Body extends Component {
         var weight2 = 1 - weight1;
         var valueinstock1 = portfolioSize * weight1;
         var valueinstock2 = portfolioSize * weight2;
-        $("#target1").append(valueinstock1);
-        $("#target2").append(valueinstock2);
+        var valueinstock111 = 0.387174832;
+        var valueinstock11 = valueinstock111 * portfolioSize;
+        var valueinstock222 = 1 - valueinstock111;
+        var valueinstock22 = valueinstock222 * portfolioSize;
+        console.log("value in stock1 - " + valueinstock1 + ", + value in stock2 - " + valueinstock2);
+        $("#target1").text("$" + valueinstock11);
+        $("#target2").text("$" + valueinstock22);
         var newvariable = {
             investment: this.state.portfolioSize,
             Stock1: this.state.Stock1,
@@ -169,15 +199,11 @@ class Body extends Component {
                     <button className="primary" onClick={this.handleFormSubmit}>Submit</button>
                 </div>
                 <div className="second" id="second2">
-                    <p>Please Allocate your Portfolio Thusly</p>
-                    <br></br>
-                    <p>{this.state.Stock1}</p>
+                    <p>Please Allocate your Portfolio of {this.state.portfolio} Like This:</p>
+                    <p>{this.state.Stock1} :</p>
                     <p id="target1"></p>
-                    <br></br>
-                    <br></br>
-                    <p>{this.state.Stock2}</p>
+                    <p>{this.state.Stock2} :</p>
                     <p id="target2"></p>
-                    <br></br>
                 </div>
             </div >
         )
