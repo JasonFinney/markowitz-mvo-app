@@ -1,3 +1,3 @@
 module.exports = {
-    Asset: require("./asset")
+    Asset: require("./assets")
 };
