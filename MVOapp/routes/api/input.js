@@ -3,5 +3,6 @@ const assetsController = require("../../controller/assetController");
 
 
 router.route("/database")
-    .get()
-    .post()
+    .post(assetsController.create);
+
+module.exports = router;

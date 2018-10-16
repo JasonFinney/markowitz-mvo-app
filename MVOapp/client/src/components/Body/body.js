@@ -126,16 +126,21 @@ class Body extends Component {
         var valueinstock2 = portfolioSize * weight2;
         $("#target1").append(valueinstock1);
         $("#target2").append(valueinstock2);
-        // $.ajax({
-        //     method: "POST",
-        //     url: "/api/inputs/database",
-        //     data: newvariable
-        // }).then(function () {
-
-        // })
-        // });
-        console.log(portfolioSize);
-    }
+        var newvariable = {
+            investment: this.state.portfolioSize,
+            Stock1: this.state.Stock1,
+            Stock2: this.state.Stock2,
+            amount1: valueinstock1,
+            amount2: valueinstock2
+        }
+        $.ajax({
+            method: "POST",
+            url: "/api/inputs/database",
+            data: newvariable
+        }).then(function () {
+            console.log(newvariable);
+        })
+    };
 
     render() {
         return (
