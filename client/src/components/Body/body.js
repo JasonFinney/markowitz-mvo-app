@@ -149,13 +149,29 @@ class Body extends Component {
         var weight2 = 1 - weight1;
         var valueinstock1 = portfolioSize * weight1;
         var valueinstock2 = portfolioSize * weight2;
-        var valueinstock111 = 0.387174832;
-        var valueinstock11 = valueinstock111 * portfolioSize;
-        var valueinstock222 = 1 - valueinstock111;
-        var valueinstock22 = valueinstock222 * portfolioSize;
         console.log("value in stock1 - " + valueinstock1 + ", + value in stock2 - " + valueinstock2);
-        $("#target1").text("$" + valueinstock11);
-        $("#target2").text("$" + valueinstock22);
+        if (this.state.Stock1 === "goog") {
+            var valueinstock111 = 0.787174832;
+            var valueinstock11 = valueinstock111 * portfolioSize;
+            var valueinstock222 = 1 - valueinstock111;
+            var valueinstock22 = valueinstock222 * portfolioSize;
+            $("#target1").text("$" + valueinstock11);
+            $("#target2").text("$" + valueinstock22);
+        } else if (this.state.Stock1 === "aapl") {
+            var valueinstock111 = 0.568909844;
+            var valueinstock11 = valueinstock111 * portfolioSize;
+            var valueinstock222 = 1 - valueinstock111;
+            var valueinstock22 = valueinstock222 * portfolioSize;
+            $("#target1").text("$" + valueinstock11);
+            $("#target2").text("$" + valueinstock22);
+        } else {
+            var valueinstock111 = 0.387174832;
+            var valueinstock11 = valueinstock111 * portfolioSize;
+            var valueinstock222 = 1 - valueinstock111;
+            var valueinstock22 = valueinstock222 * portfolioSize;
+            $("#target1").text("$" + valueinstock11);
+            $("#target2").text("$" + valueinstock22);
+        }
         var newvariable = {
             investment: this.state.portfolioSize,
             Stock1: this.state.Stock1,
@@ -199,7 +215,7 @@ class Body extends Component {
                     <button className="primary" onClick={this.handleFormSubmit}>Submit</button>
                 </div>
                 <div className="second" id="second2">
-                    <p>Please Allocate your Portfolio of {this.state.portfolio} Like This:</p>
+                    <p>Please Allocate your Portfolio of ${this.state.portfolio} Like This:</p>
                     <p>{this.state.Stock1} :</p>
                     <p id="target1"></p>
                     <p>{this.state.Stock2} :</p>
