@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import "./body.css";
 import MarketData from "barchart-market-data-api";
-/* global $ */
+// import Math from "mathjs";
+// /* global $ */
 
 class Body extends Component {
     state = {
@@ -21,56 +22,58 @@ class Body extends Component {
 
     handleFormSubmit = event => {
         event.preventDefault();
-        var portfolioSize = this.state.portfolio;
         var key = "21df5c4fdb813c022b8e2d45e36c6514";
         var md = new MarketData(key);
-        md.getHistory(this.state.Stock1, 'daily', { startDate: '20171015' }, { endDate: '20181015' }).then(function (history1) {
+
+        //Risk Free Rate
+        var riskfreeRate = 0.024;
+        console.log(riskfreeRate);
+
+        //Grab Portfolio Size
+        var portfolioSize = this.state.portfolio;
+
+        //Formulas for data 
+        // const reducer = (accumulator, currentValue) => accumulator + currentValue;
+        var ErMatrix = [];
+        // var StdMatrix = [];
+
+        md.getHistory(this.state.Stock1, 'monthly', { startDate: '20151015' }, { endDate: '20181015' }).then(function (history1) {
             console.log(history1);
-            var closeArray1 = [];
-            for (let i = 0; i < history1.length; i++) {
-                var close1 = history1[i].close;
-                closeArray1.push(close1);
+            var expectedArray1 = [];
+            for (let i = 1; i < history1.length; i++) {
+                console.log(history1[i]);
+                console.log(history1[i--]);
             }
-            console.log(closeArray1);
+            console.log(expectedArray1);
         });
-        md.getHistory(this.state.Stock2, 'daily', { startDate: '20171015' }, { endDate: '20181015' }).then(function (history2) {
-            console.log(history2);
-            var closeArray2 = [];
-            for (let i = 0; i < history2.length; i++) {
-                var close2 = history2[i].close;
-                closeArray2.push(close2);
-            }
-            console.log(closeArray2);
-        });
-        md.getHistory(this.state.Stock3, 'daily', { startDate: '20171015' }, { endDate: '20181015' }).then(function (history3) {
-            console.log(history3);
-            var closeArray3 = [];
-            for (let i = 0; i < history3.length; i++) {
-                var close3 = history3[i].close;
-                closeArray3.push(close3);
-            }
-            console.log(closeArray3);
-        });
+        // md.getHistory(this.state.Stock2, 'monthly', { startDate: '20151015' }, { endDate: '20181015' }).then(function (history2) {
+        //     console.log(history2);
+        //     var closeArray2 = [];
+        //     var expectedArray2 = [];
+        //     for (let i = 0; i < history2.length; i++) {
+        //         var close2 = history2[i].close;
+        //         closeArray2.push(close2);
+        //     }
+        //     console.log(closeArray2);
+        //     var Er2 = (closeArray2.reduce(reducer) / history2.length);
+        //     console.log(Er2);
+        //     ErMatrix.push(Er2);
+        // });
+        // md.getHistory(this.state.Stock3, 'monthly', { startDate: '20151015' }, { endDate: '20181015' }).then(function (history3) {
+        //     console.log(history3);
+        //     var closeArray3 = [];
+        //     var expectedArray3 = [];
+        //     for (let i = 0; i < history3.length; i++) {
+        //         var close3 = history3[i].close;
+        //         closeArray3.push(close3);
+        //     }
+        //     console.log(closeArray3);
+        //     var Er3 = (closeArray3.reduce(reducer) / history3.length);
+        //     console.log(Er3);
+        //     ErMatrix.push(Er3);
+        // });
 
-
-
-        // var httpRequestOptions = {
-        //     "Access-Control-Allow-Origin": 'http://localhost:3000',
-        //     "Access-Control-Allow-Credentials": "true",
-        //     "Access-Control-Allow-Methods": "GET",
-        //     "Access-Control-Allow-Headers": "Content-Type"
-        // };
-        // googleFinance.historical({
-        //     symbol: "NYSE:C",
-        //     from: '2017-10-15',
-        //     to: '2018-10-15'
-        // }, httpRequestOptions, function (err, results) {
-        //     if (err) throw err;
-        //     console.log(results);
-        // for (let i = 0; i < results.length; i++) {
-        //     var newvariable = 5;
-        //     //loop grab and create new object for each item in array
-        // }
+        console.log(ErMatrix);
         // $.ajax({
         //     method: "POST",
         //     url: "/api/inputs/database",
@@ -80,9 +83,6 @@ class Body extends Component {
         // })
         // });
         console.log(portfolioSize);
-
-
-
     }
 
     render() {

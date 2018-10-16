@@ -5,6 +5,7 @@
   "dependencies": {
     "barchart-market-data-api": "^1.0.0",
     "google-finance": "^0.1.12",
+    "mathjs": "^5.2.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-scripts": "2.0.4"
